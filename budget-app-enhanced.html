@@ -2176,13 +2176,17 @@
             }
             
             if (labels.length === 0) {
-                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
                 const parent = ctx.parentElement;
                 parent.innerHTML = '<div class="empty-state">No spending this month</div>';
                 return;
             }
             
-            charts.spending = new Chart(ctx, {
+            // Recreate canvas if it was destroyed
+            const parent = ctx.parentElement;
+            parent.innerHTML = '<canvas id="spendingChart"></canvas>';
+            const newCtx = document.getElementById('spendingChart');
+            
+            charts.spending = new Chart(newCtx, {
                 type: 'pie',
                 data: {
                     labels: labels,
@@ -2235,13 +2239,17 @@
             }
             
             if (labels.length === 0) {
-                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
                 const parent = ctx.parentElement;
                 parent.innerHTML = '<div class="empty-state">No income this month</div>';
                 return;
             }
             
-            charts.income = new Chart(ctx, {
+            // Recreate canvas if it was destroyed
+            const parent = ctx.parentElement;
+            parent.innerHTML = '<canvas id="incomeChart"></canvas>';
+            const newCtx = document.getElementById('incomeChart');
+            
+            charts.income = new Chart(newCtx, {
                 type: 'pie',
                 data: {
                     labels: labels,
@@ -2250,6 +2258,59 @@
                         backgroundColor: [
                             '#22c55e', '#10b981', '#14b8a6', '#06b6d4',
                             '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': $' + context.parsed.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAssetsChart() {
+            const ctx = document.getElementById('assetsChart');
+            if (!ctx) return;
+            
+            const labels = data.assets.map(a => a.name);
+            const values = data.assets.map(a => a.value);
+            
+            if (charts.assets) {
+                charts.assets.destroy();
+            }
+            
+            if (labels.length === 0) {
+                const parent = ctx.parentElement;
+                parent.innerHTML = '<div class="empty-state">No assets yet</div>';
+                return;
+            }
+            
+            // Recreate canvas if it was destroyed
+            const parent = ctx.parentElement;
+            parent.innerHTML = '<canvas id="assetsChart"></canvas>';
+            const newCtx = document.getElementById('assetsChart');
+            
+            charts.assets = new Chart(newCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: [
+                            '#4f46e5', '#6366f1', '#8b5cf6', '#a855f7',
+                            '#c026d3', '#d946ef', '#e879f9', '#f0abfc'
                         ]
                     }]
                 },
