@@ -886,6 +886,7 @@
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('dashboard', this)">Dashboard</button>
             <button class="nav-tab" onclick="switchTab('transactions', this)">Transactions</button>
+            <button class="nav-tab" onclick="switchTab('budget', this)">Budget</button>
             <button class="nav-tab" onclick="switchTab('bills', this)">Bills</button>
             <button class="nav-tab" onclick="switchTab('loans', this)">Loans</button>
             <button class="nav-tab" onclick="switchTab('networth', this)">Net Worth</button>
@@ -981,6 +982,35 @@
             <div class="card">
                 <h2>📝 Transactions</h2>
                 <div id="transactionsList" class="list-container"></div>
+            </div>
+        </div>
+
+        <!-- Budget Tab -->
+        <div id="budget" class="tab-content">
+            <div class="card">
+                <h2>🎯 Set Budget</h2>
+                <form id="budgetForm" onsubmit="setBudget(event)">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="budgetCategory" required>
+                            <option value="">Select category</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Monthly Budget Amount</label>
+                        <input type="number" id="budgetAmount" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <button type="submit" class="btn">Set Monthly Budget</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📊 Budget Overview</h2>
+                <div class="form-group">
+                    <label>View Month</label>
+                    <input type="month" id="budgetMonth" onchange="updateBudgetsList()">
+                </div>
+                <div id="budgetsList"></div>
             </div>
         </div>
 
@@ -1446,10 +1476,16 @@
         function init() {
             loadData();
             updateCategories();
+            updateBudgetCategories();
             
             document.getElementById('transactionDate').valueAsDate = new Date();
             const currentMonth = new Date().toISOString().slice(0, 7);
             document.getElementById('reportMonth').value = currentMonth;
+            
+            const budgetMonthInput = document.getElementById('budgetMonth');
+            if (budgetMonthInput) {
+                budgetMonthInput.value = currentMonth;
+            }
             
             loadNews();
         }
@@ -1725,6 +1761,77 @@
                 saveData();
                 updateUI();
             }
+        }
+
+        function setBudget(e) {
+            e.preventDefault();
+            
+            const category = document.getElementById('budgetCategory').value;
+            const amount = parseFloat(document.getElementById('budgetAmount').value);
+            
+            data.budgets[category] = amount;
+            saveData();
+            updateUI();
+            
+            document.getElementById('budgetForm').reset();
+        }
+
+        function deleteBudget(category) {
+            if (confirm('Delete budget for ' + category + '?')) {
+                delete data.budgets[category];
+                saveData();
+                updateUI();
+            }
+        }
+
+        function updateBudgetCategories() {
+            const categorySelect = document.getElementById('budgetCategory');
+            if (!categorySelect) return;
+            
+            categorySelect.innerHTML = '<option value="">Select category</option>';
+            getExpenseCategories().forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        function updateBudgetsList() {
+            const container = document.getElementById('budgetsList');
+            if (!container) return;
+            
+            const selectedMonth = document.getElementById('budgetMonth').value;
+            const spending = getSpendingByCategoryForMonth(selectedMonth);
+            
+            if (Object.keys(data.budgets).length === 0) {
+                container.innerHTML = '<div class="empty-state">No budgets set yet</div>';
+                return;
+            }
+            
+            container.innerHTML = Object.entries(data.budgets).map(([category, budget]) => {
+                const spent = spending[category] || 0;
+                const percentage = (spent / budget) * 100;
+                const isOver = spent > budget;
+                
+                return `
+                    <div class="budget-item">
+                        <div class="budget-header">
+                            <span class="budget-category">${category}</span>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="budget-amounts ${isOver ? 'over' : ''}">
+                                    $${spent.toFixed(2)} / $${budget.toFixed(2)}
+                                </span>
+                                <button class="delete-btn" onclick="deleteBudget('${category}')">✕</button>
+                            </div>
+                        </div>
+                        <div class="budget-bar">
+                            <div class="budget-fill ${isOver ? 'over' : ''}" 
+                                 style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function addCustomCategory(e, type) {
@@ -2841,7 +2948,7 @@
             try {
                 // Using NewsAPI.org - Free tier: 100 requests/day
                 // You can get your own free API key at https://newsapi.org/register
-                const apiKey = 'a136cc88bef74d299ffd44f4a0879865'; // Free demo key
+                const apiKey = 'ebd9488cc08a4b9cb3fa2e4e85f74fcc'; // Free demo key
                 const response = await fetch(
                     `https://newsapi.org/v2/top-headlines?category=business&country=us&pageSize=5&apiKey=${apiKey}`
                 );
@@ -2883,6 +2990,8 @@
             updateAssetsList();
             updateLiabilitiesList();
             updateGoalsList();
+            updateBudgetsList();
+            updateBudgetCategories();
             updateCategoryLists();
             updateSnapshotsList();
             updateCategories();
