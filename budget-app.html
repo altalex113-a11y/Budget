@@ -1177,6 +1177,11 @@
             border-color: #fecaca;
         }
         
+        .spending-alert.success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
         .spending-alert-icon {
             font-size: 24px;
         }
@@ -2305,15 +2310,27 @@
             if (!container) return;
             
             const currentMonth = new Date().toISOString().slice(0, 7);
-            const spending = getSpendingByCategoryForMonth(currentMonth);
+            const actual = getBudgetActualForMonth(currentMonth);
             const alerts = [];
             
             // Check budgets
             Object.entries(data.budgets).forEach(([category, budget]) => {
-                const spent = spending[category] || 0;
+                const spent = actual[category] || 0;
                 const percentage = (spent / budget) * 100;
+                const isTransfer = isTransferCategory(category);
                 
-                if (percentage >= 90 && percentage < 100) {
+                if (isTransfer) {
+                    // Savings/transfer categories: only flag it when they've
+                    // hit or exceeded the goal, and frame it as good news.
+                    if (percentage >= 100) {
+                        alerts.push({
+                            type: 'success',
+                            icon: '🎉',
+                            title: `${category} Goal Hit!`,
+                            message: `Great job — you've put away $${(spent - budget).toFixed(2)} more than planned for ${category}`
+                        });
+                    }
+                } else if (percentage >= 90 && percentage < 100) {
                     alerts.push({
                         type: 'warning',
                         icon: '⚠️',
@@ -2584,12 +2601,26 @@
             if (!categorySelect) return;
             
             categorySelect.innerHTML = '<option value="">Select category</option>';
+ 
+            const expenseGroup = document.createElement('optgroup');
+            expenseGroup.label = 'Expenses';
             getExpenseCategories().forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat;
                 option.textContent = cat;
-                categorySelect.appendChild(option);
+                expenseGroup.appendChild(option);
             });
+            categorySelect.appendChild(expenseGroup);
+ 
+            const transferGroup = document.createElement('optgroup');
+            transferGroup.label = 'Savings / Transfers';
+            getTransferCategories().forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                transferGroup.appendChild(option);
+            });
+            categorySelect.appendChild(transferGroup);
         }
  
         function updateBudgetsList() {
@@ -2597,7 +2628,7 @@
             if (!container) return;
             
             const selectedMonth = document.getElementById('budgetMonth').value;
-            const spending = getSpendingByCategoryForMonth(selectedMonth);
+            const actual = getBudgetActualForMonth(selectedMonth);
             
             if (Object.keys(data.budgets).length === 0) {
                 container.innerHTML = '<div class="empty-state">No budgets set yet</div>';
@@ -2605,24 +2636,38 @@
             }
             
             container.innerHTML = Object.entries(data.budgets).map(([category, budget]) => {
-                const spent = spending[category] || 0;
+                const spent = actual[category] || 0;
                 const percentage = (spent / budget) * 100;
+                const isTransfer = isTransferCategory(category);
+                // For real expenses, going over budget is bad (red).
+                // For savings/transfer categories, going over is good — you
+                // put away more than planned — so it stays green and the
+                // copy flips to a congratulations instead of a warning.
                 const isOver = spent > budget;
-                
+                const badStyle = isOver && !isTransfer;
+                const goodOverStyle = isOver && isTransfer;
+ 
+                let amountsHtml;
+                if (goodOverStyle) {
+                    amountsHtml = `$${spent.toFixed(2)} / $${budget.toFixed(2)} <span style="color:#16a34a;font-weight:bold;">🎉 +$${(spent - budget).toFixed(2)} extra saved!</span>`;
+                } else {
+                    amountsHtml = `$${spent.toFixed(2)} / $${budget.toFixed(2)}`;
+                }
+ 
                 return `
                     <div class="budget-item">
                         <div class="budget-header">
-                            <span class="budget-category">${category}</span>
+                            <span class="budget-category">${category}${isTransfer ? ' <span style="font-size:11px;color:#3b82f6;font-weight:600;">(savings goal)</span>' : ''}</span>
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <span class="budget-amounts ${isOver ? 'over' : ''}">
-                                    $${spent.toFixed(2)} / $${budget.toFixed(2)}
+                                <span class="budget-amounts ${badStyle ? 'over' : ''}" style="${goodOverStyle ? 'color:#16a34a;' : ''}">
+                                    ${amountsHtml}
                                 </span>
                                 <button class="delete-btn" onclick="deleteBudget('${category}')">✕</button>
                             </div>
                         </div>
                         <div class="budget-bar">
-                            <div class="budget-fill ${isOver ? 'over' : ''}" 
-                                 style="width: ${Math.min(percentage, 100)}%"></div>
+                            <div class="budget-fill ${badStyle ? 'over' : ''}" 
+                                 style="width: ${Math.min(percentage, 100)}%; ${goodOverStyle ? 'background:#16a34a;' : ''}"></div>
                         </div>
                     </div>
                 `;
@@ -2717,6 +2762,22 @@
                 spending[t.category] = (spending[t.category] || 0) + t.amount;
             });
             return spending;
+        }
+ 
+        // Used for Budget tab tracking only: includes both real expenses AND
+        // savings/transfer amounts, so you can set a budget/goal against a
+        // "Practice: Car Payment" or "Roth IRA" category and see progress.
+        // (Dashboard "Spending" totals and savings rate stay expense-only.)
+        function getBudgetActualForMonth(month) {
+            const actual = {};
+            data.transactions.filter(t => (t.type === 'expense' || t.type === 'transfer') && t.date.startsWith(month)).forEach(t => {
+                actual[t.category] = (actual[t.category] || 0) + t.amount;
+            });
+            return actual;
+        }
+ 
+        function isTransferCategory(category) {
+            return getTransferCategories().includes(category);
         }
  
         function filterTransactions(filter, element) {
