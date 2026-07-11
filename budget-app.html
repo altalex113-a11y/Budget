@@ -261,6 +261,11 @@
             border-left: 4px solid #ef4444;
         }
         
+        .transaction-item.transfer {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+        }
+        
         .asset-item.asset {
             background: #f0fdf4;
             border-left: 4px solid #22c55e;
@@ -343,6 +348,10 @@
         
         .expense .transaction-amount {
             color: #b91c1c;
+        }
+        
+        .transfer .transaction-amount {
+            color: #1d4ed8;
         }
         
         .delete-btn,
@@ -436,31 +445,31 @@
             border-color: #ef4444;
             color: #b91c1c;
         }
-
+ 
         .category-summary {
             padding: 10px 0;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
         }
-
+ 
         .category-summary:last-child {
             border-bottom: none;
         }
-
+ 
         .category-name {
             color: #374151;
             font-weight: 500;
         }
-
+ 
         .category-amount {
             font-weight: 600;
         }
-
+ 
         .category-amount.income {
             color: #15803d;
         }
-
+ 
         .category-amount.expense {
             color: #b91c1c;
         }
@@ -1215,7 +1224,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- Navigation -->
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('dashboard', this)">Dashboard</button>
@@ -1229,10 +1238,10 @@
             <button class="nav-tab" onclick="switchTab('reports', this)">Reports</button>
             <button class="nav-tab" onclick="switchTab('settings', this)">Settings</button>
         </div>
-
+ 
         <!-- Floating Action Button -->
         <button class="fab" onclick="quickAddTransaction()" title="Quick Add">+</button>
-
+ 
         <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
             <div class="card">
@@ -1256,7 +1265,7 @@
                     <canvas id="spendingChart"></canvas>
                 </div>
             </div>
-
+ 
             <div class="card">
                 <h2>💵 Income (This Month)</h2>
                 <div class="chart-container">
@@ -1276,7 +1285,7 @@
                 <div id="newsContainer"></div>
             </div>
         </div>
-
+ 
         <!-- Transactions Tab -->
         <div id="transactions" class="tab-content">
             <div class="card">
@@ -1287,6 +1296,7 @@
                         <select id="transactionType" onchange="updateCategories()">
                             <option value="expense">Expense</option>
                             <option value="income">Income</option>
+                            <option value="transfer">Savings / Transfer (not counted as spending)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1316,7 +1326,7 @@
                     <button type="submit" class="btn" id="transactionSubmitBtn">Add Transaction</button>
                 </form>
             </div>
-
+ 
             <div class="card">
                 <h2>🔍 Search & Filter</h2>
                 <input type="text" id="transactionSearch" class="search-box" placeholder="Search..." oninput="updateTransactionsList()">
@@ -1324,16 +1334,17 @@
                     <div class="filter-chip active" onclick="filterTransactions('all', this)">All</div>
                     <div class="filter-chip" onclick="filterTransactions('income', this)">Income</div>
                     <div class="filter-chip" onclick="filterTransactions('expense', this)">Expenses</div>
+                    <div class="filter-chip" onclick="filterTransactions('transfer', this)">Transfers</div>
                     <div class="filter-chip" onclick="filterTransactions('recurring', this)">Recurring</div>
                 </div>
             </div>
-
+ 
             <div class="card">
                 <h2>📝 Transactions</h2>
                 <div id="transactionsList" class="list-container"></div>
             </div>
         </div>
-
+ 
         <!-- Budget Tab -->
         <div id="budget" class="tab-content">
             <div class="card">
@@ -1358,7 +1369,7 @@
                     <button type="submit" class="btn">Set Monthly Budget</button>
                 </form>
             </div>
-
+ 
             <div class="card">
                 <h2>📊 Budget Overview</h2>
                 <div class="form-group">
@@ -1368,7 +1379,7 @@
                 <div id="budgetsList"></div>
             </div>
         </div>
-
+ 
         <!-- Bills Tab (NEW) -->
         <div id="bills" class="tab-content">
             <div class="card">
@@ -1398,13 +1409,13 @@
                     <button type="submit" class="btn">Add Bill</button>
                 </form>
             </div>
-
+ 
             <div class="card">
                 <h2>📋 Upcoming Bills</h2>
                 <div id="billsList"></div>
             </div>
         </div>
-
+ 
         <!-- Loans Tab (NEW) -->
         <div id="loans" class="tab-content">
             <div class="card">
@@ -1429,13 +1440,13 @@
                     <button type="submit" class="btn" id="loanSubmitBtn">Add Loan</button>
                 </form>
             </div>
-
+ 
             <div class="card">
                 <h2>🎓 Your Student Loans</h2>
                 <div id="loansList"></div>
             </div>
         </div>
-
+ 
         <!-- Net Worth Tab -->
         <div id="networth" class="tab-content">
             <div class="card">
@@ -1469,12 +1480,12 @@
                     <button type="submit" class="btn" id="assetSubmitBtn">Add Item</button>
                 </form>
             </div>
-
+ 
             <div class="card">
                 <h2 style="color: #15803d;">💎 Assets</h2>
                 <div id="assetsList"></div>
             </div>
-
+ 
             <div class="card">
                 <h2 style="color: #b91c1c;">📊 Liabilities</h2>
                 <div id="liabilitiesList"></div>
@@ -1486,7 +1497,7 @@
                 <div id="snapshotsList" style="margin-top: 15px;"></div>
             </div>
         </div>
-
+ 
         <!-- Goals Tab -->
         <div id="goals" class="tab-content">
             <div class="card">
@@ -1511,13 +1522,13 @@
                     <button type="submit" class="btn" id="goalSubmitBtn">Add Goal</button>
                 </form>
             </div>
-
+ 
             <div class="card">
                 <h2>📈 Your Savings Goals</h2>
                 <div id="goalsList"></div>
             </div>
         </div>
-
+ 
         <!-- Insights Tab (NEW) -->
         <div id="insights" class="tab-content">
             <div class="card">
@@ -1561,7 +1572,7 @@
                 <div id="averageSpending"></div>
             </div>
         </div>
-
+ 
         <!-- Reports Tab -->
         <div id="reports" class="tab-content">
             <div class="card">
@@ -1601,7 +1612,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- Settings Tab -->
         <div id="settings" class="tab-content">
             <div class="card">
@@ -1644,7 +1655,7 @@
                     </div>
                 </form>
                 <div id="expenseCategoriesList"></div>
-
+ 
                 <h3 style="color: #15803d;">Income</h3>
                 <form id="addIncomeCategoryForm" onsubmit="addCustomCategory(event, 'income')" style="margin-bottom: 15px;">
                     <div style="display: flex; gap: 10px;">
@@ -1654,10 +1665,21 @@
                     </div>
                 </form>
                 <div id="incomeCategoriesList"></div>
+ 
+                <h3 style="color: #1d4ed8;">Savings / Transfer</h3>
+                <p style="color: #6b7280; font-size: 12px; margin-bottom: 10px;">These categories are excluded from spending totals and savings rate. Switch a category to "Expense" above once it becomes a real bill (e.g. you get a car) — just pick Expense as the Type on future transactions.</p>
+                <form id="addTransferCategoryForm" onsubmit="addCustomCategory(event, 'transfer')" style="margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="newTransferCategory" placeholder="New category" 
+                               style="flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px;" required>
+                        <button type="submit" class="btn btn-sm" style="background: #3b82f6;">Add</button>
+                    </div>
+                </form>
+                <div id="transferCategoriesList"></div>
             </div>
         </div>
     </div>
-
+ 
     <script>
         let data = {
             transactions: [],
@@ -1667,6 +1689,7 @@
             snapshots: [],
             customExpenseCategories: [],
             customIncomeCategories: [],
+            customTransferCategories: [],
             goals: [],
             bills: [],
             loans: [],
@@ -1675,17 +1698,18 @@
             darkMode: false,
             compactView: false
         };
-
+ 
         let currentFilter = 'all';
         let editingItem = null;
         let charts = {};
         let swipeStartX = 0;
         let swipeStartY = 0;
         let swipeElement = null;
-
+ 
         const defaultExpenseCategories = ['Housing', 'Transportation', 'Utilities', 'Entertainment', 'Other'];
         const defaultIncomeCategories = ['Salary', 'Other'];
-
+        const defaultTransferCategories = ['General Savings', 'Roth IRA / Investing', 'Emergency Fund', 'Practice: Car Payment', 'Practice: Car Insurance'];
+ 
         const themes = {
             modern: {
                 name: '✨ Modern',
@@ -1744,15 +1768,19 @@
                 cardRadius: '2px'
             }
         };
-
+ 
         function getExpenseCategories() {
             return [...defaultExpenseCategories, ...data.customExpenseCategories];
         }
-
+ 
         function getIncomeCategories() {
             return [...defaultIncomeCategories, ...data.customIncomeCategories];
         }
-
+ 
+        function getTransferCategories() {
+            return [...defaultTransferCategories, ...(data.customTransferCategories || [])];
+        }
+ 
         function loadData() {
             const saved = localStorage.getItem('budgetAppDataV4');
             
@@ -1774,6 +1802,7 @@
                             snapshots: imported.snapshots || [],
                             customExpenseCategories: imported.customExpenseCategories || [],
                             customIncomeCategories: imported.customIncomeCategories || [],
+                            customTransferCategories: [],
                             goals: imported.goals || [],
                             bills: [], // New in V4
                             loans: [], // New in V4
@@ -1799,6 +1828,7 @@
             if (!data.goals) data.goals = [];
             if (!data.customExpenseCategories) data.customExpenseCategories = [];
             if (!data.customIncomeCategories) data.customIncomeCategories = [];
+            if (!data.customTransferCategories) data.customTransferCategories = [];
             if (!data.theme) data.theme = 'modern';
             if (!data.bills) data.bills = [];
             if (!data.loans) data.loans = [];
@@ -1810,7 +1840,7 @@
             applyCompactView(data.compactView);
             updateUI();
         }
-
+ 
         function getDefaultData() {
             return {
                 transactions: [],
@@ -1820,6 +1850,7 @@
                 snapshots: [],
                 customExpenseCategories: [],
                 customIncomeCategories: [],
+                customTransferCategories: [],
                 goals: [],
                 bills: [],
                 loans: [],
@@ -1828,11 +1859,11 @@
                 compactView: false
             };
         }
-
+ 
         function saveData() {
             localStorage.setItem('budgetAppDataV4', JSON.stringify(data));
         }
-
+ 
         function init() {
             loadData();
             updateCategories();
@@ -1851,7 +1882,7 @@
             
             loadNews();
         }
-
+ 
         function switchTab(tabName, element) {
             haptic('light');
             
@@ -1881,11 +1912,11 @@
                 updateBudgetHeatmap();
             }
         }
-
+ 
         function updateCategories() {
             const type = document.getElementById('transactionType').value;
             const categorySelect = document.getElementById('transactionCategory');
-            const categories = type === 'expense' ? getExpenseCategories() : getIncomeCategories();
+            const categories = type === 'expense' ? getExpenseCategories() : (type === 'income' ? getIncomeCategories() : getTransferCategories());
             
             categorySelect.innerHTML = '<option value="">Select category</option>';
             categories.forEach(cat => {
@@ -1895,7 +1926,7 @@
                 categorySelect.appendChild(option);
             });
         }
-
+ 
         function addTransaction(e) {
             e.preventDefault();
             
@@ -1925,7 +1956,7 @@
             document.getElementById('transactionForm').reset();
             document.getElementById('transactionDate').valueAsDate = new Date();
         }
-
+ 
         function editTransaction(id) {
             haptic('light');
             const transaction = data.transactions.find(t => t.id === id);
@@ -1947,7 +1978,7 @@
             document.querySelector('.nav-tab[onclick*="transactions"]').click();
             window.scrollTo(0, 0);
         }
-
+ 
         function deleteTransaction(id) {
             if (confirm('Delete?')) {
                 haptic('medium');
@@ -1956,7 +1987,7 @@
                 updateUI();
             }
         }
-
+ 
         function addBill(e) {
             e.preventDefault();
             
@@ -1976,7 +2007,7 @@
             document.getElementById('billForm').reset();
             document.getElementById('billRecurring').checked = true;
         }
-
+ 
         function toggleBillPaid(id) {
             const bill = data.bills.find(b => b.id === id);
             if (bill) {
@@ -1985,7 +2016,7 @@
                 updateUI();
             }
         }
-
+ 
         function deleteBill(id) {
             if (confirm('Delete bill?')) {
                 data.bills = data.bills.filter(b => b.id !== id);
@@ -1993,7 +2024,7 @@
                 updateUI();
             }
         }
-
+ 
         function addLoan(e) {
             e.preventDefault();
             
@@ -2031,7 +2062,7 @@
             
             document.getElementById('loanForm').reset();
         }
-
+ 
         function editLoan(id) {
             const loan = data.loans.find(l => l.id === id);
             if (!loan) return;
@@ -2048,7 +2079,7 @@
             document.querySelector('.nav-tab[onclick*="loans"]').click();
             window.scrollTo(0, 0);
         }
-
+ 
         function deleteLoan(id) {
             if (confirm('Delete loan?')) {
                 data.loans = data.loans.filter(l => l.id !== id);
@@ -2056,7 +2087,7 @@
                 updateUI();
             }
         }
-
+ 
         function addAssetOrLiability(e) {
             e.preventDefault();
             
@@ -2090,7 +2121,7 @@
             
             document.getElementById('assetForm').reset();
         }
-
+ 
         function deleteAsset(id) {
             if (confirm('Delete?')) {
                 data.assets = data.assets.filter(a => a.id !== id);
@@ -2098,7 +2129,7 @@
                 updateUI();
             }
         }
-
+ 
         function deleteLiability(id) {
             if (confirm('Delete?')) {
                 data.liabilities = data.liabilities.filter(l => l.id !== id);
@@ -2106,7 +2137,7 @@
                 updateUI();
             }
         }
-
+ 
         function addGoal(e) {
             e.preventDefault();
             
@@ -2132,7 +2163,7 @@
             
             document.getElementById('goalForm').reset();
         }
-
+ 
         function contributeToGoal(id) {
             const amount = prompt('How much to add?');
             if (amount && !isNaN(amount)) {
@@ -2144,7 +2175,7 @@
                 }
             }
         }
-
+ 
         function deleteGoal(id) {
             if (confirm('Delete goal?')) {
                 haptic();
@@ -2153,7 +2184,7 @@
                 updateUI();
             }
         }
-
+ 
         // ============================================
         // V4.2 NEW FEATURES
         // ============================================
@@ -2289,7 +2320,7 @@
                         title: `${category} at ${percentage.toFixed(0)}%`,
                         message: `You've used ${percentage.toFixed(0)}% of your ${category} budget`
                     });
-                } else if (percentage >= 100) {
+                } else if (percentage > 100) {
                     alerts.push({
                         type: 'danger',
                         icon: '🚨',
@@ -2415,9 +2446,9 @@
             const ctx = document.getElementById('savingsRateChart');
             if (!ctx) return;
             
-            // Get all months with data
+            // Get all months with data (transfers excluded from income/expenses)
             const monthlyData = {};
-            data.transactions.forEach(t => {
+            data.transactions.filter(t => t.type === 'income' || t.type === 'expense').forEach(t => {
                 const month = t.date.slice(0, 7);
                 if (!monthlyData[month]) {
                     monthlyData[month] = { income: 0, expenses: 0 };
@@ -2526,18 +2557,7 @@
             
             swipeElement = null;
         }
-        
-        // Update insights to include new charts
-        function updateInsights() {
-            updateSmartInsights();
-            updateTrendsChart();
-            updateAlerts();
-            updateMonthComparison();
-            updateAverageSpending();
-            updateNetworthTimeline();
-            updateSavingsRateChart();
-        }
-
+ 
         function setBudget(e) {
             e.preventDefault();
             
@@ -2550,7 +2570,7 @@
             
             document.getElementById('budgetForm').reset();
         }
-
+ 
         function deleteBudget(category) {
             if (confirm('Delete budget for ' + category + '?')) {
                 delete data.budgets[category];
@@ -2558,7 +2578,7 @@
                 updateUI();
             }
         }
-
+ 
         function updateBudgetCategories() {
             const categorySelect = document.getElementById('budgetCategory');
             if (!categorySelect) return;
@@ -2571,7 +2591,7 @@
                 categorySelect.appendChild(option);
             });
         }
-
+ 
         function updateBudgetsList() {
             const container = document.getElementById('budgetsList');
             if (!container) return;
@@ -2608,16 +2628,16 @@
                 `;
             }).join('');
         }
-
+ 
         function addCustomCategory(e, type) {
             e.preventDefault();
             
-            const inputId = type === 'expense' ? 'newExpenseCategory' : 'newIncomeCategory';
+            const inputId = type === 'expense' ? 'newExpenseCategory' : (type === 'income' ? 'newIncomeCategory' : 'newTransferCategory');
             const categoryName = document.getElementById(inputId).value.trim();
             
             if (!categoryName) return;
             
-            const existingCategories = type === 'expense' ? getExpenseCategories() : getIncomeCategories();
+            const existingCategories = type === 'expense' ? getExpenseCategories() : (type === 'income' ? getIncomeCategories() : getTransferCategories());
             if (existingCategories.includes(categoryName)) {
                 alert('Already exists!');
                 return;
@@ -2625,8 +2645,10 @@
             
             if (type === 'expense') {
                 data.customExpenseCategories.push(categoryName);
-            } else {
+            } else if (type === 'income') {
                 data.customIncomeCategories.push(categoryName);
+            } else {
+                data.customTransferCategories.push(categoryName);
             }
             
             saveData();
@@ -2634,19 +2656,21 @@
             
             document.getElementById(inputId).value = '';
         }
-
+ 
         function deleteCustomCategory(categoryName, type) {
             if (confirm('Delete?')) {
                 if (type === 'expense') {
                     data.customExpenseCategories = data.customExpenseCategories.filter(c => c !== categoryName);
-                } else {
+                } else if (type === 'income') {
                     data.customIncomeCategories = data.customIncomeCategories.filter(c => c !== categoryName);
+                } else {
+                    data.customTransferCategories = data.customTransferCategories.filter(c => c !== categoryName);
                 }
                 saveData();
                 updateUI();
             }
         }
-
+ 
         function calculateTotals() {
             const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
             const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
@@ -2656,14 +2680,15 @@
             
             return { totalIncome, totalExpenses, totalAssets, totalLiabilities, netWorth };
         }
-
+ 
         function calculateMonthlyTotals(month) {
             const monthlyIncome = data.transactions.filter(t => t.type === 'income' && t.date.startsWith(month)).reduce((sum, t) => sum + t.amount, 0);
             const monthlyExpenses = data.transactions.filter(t => t.type === 'expense' && t.date.startsWith(month)).reduce((sum, t) => sum + t.amount, 0);
+            const monthlyTransfers = data.transactions.filter(t => t.type === 'transfer' && t.date.startsWith(month)).reduce((sum, t) => sum + t.amount, 0);
             
-            return { monthlyIncome, monthlyExpenses };
+            return { monthlyIncome, monthlyExpenses, monthlyTransfers };
         }
-
+ 
         function updateHeaderStats() {
             const period = document.getElementById('headerPeriod').value;
             const currentMonth = new Date().toISOString().slice(0, 7);
@@ -2685,7 +2710,7 @@
             const { netWorth } = calculateTotals();
             document.getElementById('netWorth').textContent = '$' + netWorth.toFixed(2);
         }
-
+ 
         function getSpendingByCategoryForMonth(month) {
             const spending = {};
             data.transactions.filter(t => t.type === 'expense' && t.date.startsWith(month)).forEach(t => {
@@ -2693,14 +2718,14 @@
             });
             return spending;
         }
-
+ 
         function filterTransactions(filter, element) {
             currentFilter = filter;
             document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
             element.classList.add('active');
             updateTransactionsList();
         }
-
+ 
         function updateTransactionsList() {
             const container = document.getElementById('transactionsList');
             const searchTerm = document.getElementById('transactionSearch').value.toLowerCase();
@@ -2711,6 +2736,8 @@
                 filtered = filtered.filter(t => t.type === 'income');
             } else if (currentFilter === 'expense') {
                 filtered = filtered.filter(t => t.type === 'expense');
+            } else if (currentFilter === 'transfer') {
+                filtered = filtered.filter(t => t.type === 'transfer');
             } else if (currentFilter === 'recurring') {
                 filtered = filtered.filter(t => t.recurring);
             }
@@ -2735,6 +2762,7 @@
                     <div class="transaction-info">
                         <div class="transaction-category">
                             ${t.category}
+                            ${t.type === 'transfer' ? '<span class="recurring-badge" style="background:#dbeafe;color:#1d4ed8;">SAVINGS/TRANSFER</span>' : ''}
                             ${t.recurring ? '<span class="recurring-badge">RECURRING</span>' : ''}
                         </div>
                         ${t.description ? `<div class="transaction-description">${t.description}</div>` : ''}
@@ -2753,7 +2781,7 @@
                 </div>
             `).join('');
         }
-
+ 
         function updateBillsList() {
             const container = document.getElementById('billsList');
             const today = new Date().getDate();
@@ -2786,7 +2814,7 @@
                 `;
             }).join('');
         }
-
+ 
         function updateBillCalendar() {
             const container = document.getElementById('billCalendar');
             const now = new Date();
@@ -2815,7 +2843,7 @@
             html += '</div>';
             container.innerHTML = html;
         }
-
+ 
         function updateLoansList() {
             const container = document.getElementById('loansList');
             
@@ -2849,7 +2877,7 @@
                 `;
             }).join('');
         }
-
+ 
         function updateAssetsList() {
             const container = document.getElementById('assetsList');
             const totalAssets = data.assets.reduce((sum, a) => sum + a.value, 0);
@@ -2878,7 +2906,7 @@
                 </div>
             `;
         }
-
+ 
         function updateLiabilitiesList() {
             const container = document.getElementById('liabilitiesList');
             const totalLiabilities = data.liabilities.reduce((sum, l) => sum + l.value, 0);
@@ -2907,7 +2935,7 @@
                 </div>
             `;
         }
-
+ 
         function updateGoalsList() {
             const container = document.getElementById('goalsList');
             
@@ -2945,7 +2973,7 @@
                 `;
             }).join('');
         }
-
+ 
         function updateCategoryLists() {
             const expenseContainer = document.getElementById('expenseCategoriesList');
             if (data.customExpenseCategories.length === 0) {
@@ -2970,8 +2998,22 @@
                     </div>
                 `).join('');
             }
+ 
+            const transferContainer = document.getElementById('transferCategoriesList');
+            if (transferContainer) {
+                if (!data.customTransferCategories || data.customTransferCategories.length === 0) {
+                    transferContainer.innerHTML = '<div class="empty-state" style="padding: 20px;">No custom</div>';
+                } else {
+                    transferContainer.innerHTML = data.customTransferCategories.map(cat => `
+                        <div style="display: flex; justify-content: space-between; padding: 10px; background: #eff6ff; border-radius: 8px; margin-bottom: 8px;">
+                            <span>${cat}</span>
+                            <button class="delete-btn" onclick="deleteCustomCategory('${cat}', 'transfer')">✕</button>
+                        </div>
+                    `).join('');
+                }
+            }
         }
-
+ 
         function takeSnapshot() {
             const currentMonth = new Date().toISOString().slice(0, 7);
             const { netWorth } = calculateTotals();
@@ -2987,7 +3029,7 @@
             updateUI();
             alert('Snapshot saved!');
         }
-
+ 
         function updateSnapshotsList() {
             const container = document.getElementById('snapshotsList');
             
@@ -3007,7 +3049,7 @@
                 </div>
             `).join('');
         }
-
+ 
         function updateProjections() {
             const rate = parseFloat(document.getElementById('projectionRate').value) || 3.5;
             const monthlyRate = rate / 100 / 12;
@@ -3043,15 +3085,17 @@
                 </div>
             `).join('');
         }
-
+ 
         function updateInsights() {
             updateSmartInsights();
             updateTrendsChart();
             updateAlerts();
             updateMonthComparison();
             updateAverageSpending();
+            updateNetworthTimeline();
+            updateSavingsRateChart();
         }
-
+ 
         function updateSmartInsights() {
             const container = document.getElementById('smartInsights');
             const insights = [];
@@ -3120,7 +3164,7 @@
                 `).join('');
             }
         }
-
+ 
         function updateTrendsChart() {
             const ctx = document.getElementById('trendsChart');
             if (!ctx) return;
@@ -3170,7 +3214,7 @@
                 }
             });
         }
-
+ 
         function updateAlerts() {
             const container = document.getElementById('alertsList');
             const alerts = [];
@@ -3211,7 +3255,7 @@
                 `).join('');
             }
         }
-
+ 
         function updateMonthComparison() {
             const container = document.getElementById('monthComparison');
             const now = new Date();
@@ -3250,7 +3294,7 @@
                 </div>
             `;
         }
-
+ 
         function updateAverageSpending() {
             const container = document.getElementById('averageSpending');
             
@@ -3282,7 +3326,7 @@
                 </div>
             `).join('');
         }
-
+ 
         function updateMonthlyReport() {
             const month = document.getElementById('reportMonth').value;
             const container = document.getElementById('monthlySummary');
@@ -3327,7 +3371,7 @@
                 </div>
             `;
         }
-
+ 
         function updateYearEndSummary() {
             const year = document.getElementById('yearSelect').value;
             const container = document.getElementById('yearEndSummary');
@@ -3404,7 +3448,7 @@
                 </div>
             `;
         }
-
+ 
         function calculateWhatIf() {
             const savings = parseFloat(document.getElementById('whatIfSavings').value) || 0;
             const months = parseInt(document.getElementById('whatIfMonths').value) || 12;
@@ -3428,7 +3472,7 @@
                 </div>
             `;
         }
-
+ 
         function updateSpendingForecast() {
             const container = document.getElementById('spendingForecast');
             
@@ -3463,7 +3507,7 @@
                 </div>
             `;
         }
-
+ 
         function exportData() {
             const dataStr = JSON.stringify(data, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -3474,7 +3518,7 @@
             link.click();
             URL.revokeObjectURL(url);
         }
-
+ 
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -3495,13 +3539,13 @@
             };
             reader.readAsText(file);
         }
-
+ 
         function updateCharts() {
             updateSpendingChart();
             updateIncomeChart();
             updateAssetsChart();
         }
-
+ 
         function updateSpendingChart() {
             const ctx = document.getElementById('spendingChart');
             if (!ctx) return;
@@ -3545,7 +3589,7 @@
                 }
             });
         }
-
+ 
         function updateIncomeChart() {
             const ctx = document.getElementById('incomeChart');
             if (!ctx) return;
@@ -3593,7 +3637,7 @@
                 }
             });
         }
-
+ 
         function updateAssetsChart() {
             const ctx = document.getElementById('assetsChart');
             if (!ctx) return;
@@ -3635,13 +3679,13 @@
                 }
             });
         }
-
+ 
         function toggleDarkMode() {
             data.darkMode = document.getElementById('darkModeToggle').checked;
             saveData();
             applyDarkMode(data.darkMode);
         }
-
+ 
         function applyDarkMode(isDark) {
             document.getElementById('darkModeToggle').checked = isDark;
             if (isDark) {
@@ -3650,13 +3694,13 @@
                 document.body.classList.remove('dark-mode');
             }
         }
-
+ 
         function toggleCompactView() {
             data.compactView = document.getElementById('compactViewToggle').checked;
             saveData();
             applyCompactView(data.compactView);
         }
-
+ 
         function applyCompactView(isCompact) {
             document.getElementById('compactViewToggle').checked = isCompact;
             const container = document.querySelector('.container');
@@ -3666,12 +3710,12 @@
                 container.classList.remove('compact-view');
             }
         }
-
+ 
         function quickAddTransaction() {
             switchTab('transactions', document.querySelector('[onclick*="transactions"]'));
             document.getElementById('transactionAmount').focus();
         }
-
+ 
         function applyTheme(themeName) {
             const theme = themes[themeName];
             if (!theme) return;
@@ -3694,14 +3738,14 @@
             `;
             document.head.appendChild(style);
         }
-
+ 
         function changeTheme(themeName) {
             data.theme = themeName;
             saveData();
             applyTheme(themeName);
             updateThemeSelector();
         }
-
+ 
         function updateThemeSelector() {
             const container = document.getElementById('themeSelector');
             
@@ -3723,7 +3767,7 @@
                     </div>
                 `).join('') + '</div>';
         }
-
+ 
         async function loadNews() {
             const container = document.getElementById('newsContainer');
             if (!container) return;
@@ -3780,7 +3824,7 @@
                 `;
             }
         }
-
+ 
         function updateUI() {
             updateHeaderStats();
             updateQuickStats();
@@ -3804,8 +3848,9 @@
                 updateCharts();
             }
         }
-
+ 
         window.addEventListener('load', init);
     </script>
 </body>
 </html>
+ 
